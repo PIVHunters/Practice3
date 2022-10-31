@@ -65,6 +65,9 @@ def self_input():
             first_arg = first_arg.replace('[', '').split(']')
             first_arg = [value.split(',') for value in first_arg if value != '']
             first_arg = [[float(cell) for cell in row] for row in first_arg]
+            if not is_uniform(first_arg):
+                print("\n\t\t\tВы ошиблись в параметрах!\n\t\t\t  Выполните ввод заново")
+                return self_input()
 
             second_arg = input("Матрица или число: ")
             if second_arg in ["", " "]:  # Проверка на пустой ввод
@@ -94,6 +97,9 @@ def self_input():
             arg = arg.replace('[', '').split(']')
             arg = [value.split(',') for value in arg if value != '']
             arg = [[float(cell) for cell in row] for row in arg]
+            if not is_uniform(arg):
+                print("\n\t\t\tВы ошиблись в параметрах!\n\t\t\t  Выполните ввод заново")
+                return self_input()
             return arg
         except ValueError:
             print("\n\t\t\tВы ошиблись в параметрах!\n\t\t\t  Выполните ввод заново")
@@ -103,12 +109,29 @@ def self_input():
     return self_input()
 
 
+# Проверка на однородность
+def is_uniform(matrix):
+    for row in matrix:
+        if len(row) != len(matrix):
+            return False
+    return True
+
+
 # Функция порверяющая правильность аргументов для заданной задачи
 def validator(task, *args, **kwargs):
     if len(args) != 1:
-        if task != "Умножение на число" and type(args[1]) == list:
-            return task, args[0], args[1]
         if task == "Умножение на число" and type(args[1]) == float:
+            return task, args[0], args[1]
+        if task == "Перемножение" and type(args[1]) == list and len(args[0][0]) == len(args[1]):
+            return task, args[0], args[1]
+        if task == "Сложение" and type(args[1]) == list and is_uniform(args[1]):
+            return task, args[0], args[1]
+        if task == "Вычитание" and type(args[1]) == list and is_uniform(args[1]):
+            return task, args[0], args[1]
+    else:
+        if task == "Транспонирование" and type(args[0]) == list and is_uniform(args[0]):
+            return task, args[0], args[1]
+        if task == "Нахождение обратной матрицы" and type(args[0]) == list and is_uniform(args[0]):
             return task, args[0], args[1]
 
     print("\n\t\t\tВы ошиблись в параметрах!\n\t\t\t  Выполните ввод заново")
